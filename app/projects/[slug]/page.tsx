@@ -26,18 +26,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// Icon swing kecil — sesuaikan dengan project-mu.
-const ICON_BG: Record<string, string> = {
-  "sistem-kepegawaian": "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300",
-  "clone-simrs": "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
-  projek1: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
-};
-
-const EMOJI: Record<string, string> = {
-  "sistem-kepegawaian": "🗂️",
-  "clone-simrs": "🏥",
-  projek1: "🌱",
-};
+// Icon generik untuk semua project otomatis —
+// kalau mau ikon khusus per repo, tambahkan entri kurasi di lib/projects.ts.
+const ICON_BG = "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400";
+const EMOJI = "💻";
 
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
@@ -72,10 +64,10 @@ export default async function ProjectPage({ params }: Props) {
             <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">{project.tagline}</p>
           </div>
           <span
-            className={`hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl sm:flex ${ICON_BG[project.slug] ?? "bg-zinc-100 dark:bg-zinc-900"}`}
+            className={`hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl sm:flex ${ICON_BG}`}
             aria-hidden
           >
-            {EMOJI[project.slug] ?? "💻"}
+            {EMOJI}
           </span>
         </div>
 

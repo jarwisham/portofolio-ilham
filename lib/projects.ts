@@ -1,16 +1,17 @@
 // ─────────────────────────────────────────────────────────────
-// Hybrid data layer: kamu yang kurasi project (cerita & metadata),
-// GitHub API yang memasok data live (stars, bahasa, last update).
+// Hybrid data layer: GitHub API memasok SEMUA project otomatis.
 //
-// CARA PAKAI:
-// 1. Ganti `github` dengan nama repo-mu (format: "owner/repo") —
-//    bagian ini otomatis menarik stats live dari GitHub.
-// 2. Isi `title`, `description`, `highlights`, `stack`, `year`,
-//    `slug` manual — inilah "cerita" yang bikin portfolio-mu beda
-//    dari sekadar daftar repo.
-// 3. Tambah screenshot di /public/projects/<slug>.png (opsional).
-// 4. Push project-mu ke GitHub, lalu deploy ulang (atau tunggu
-//    revalidasi otomatis) — stats akan mengikuti.
+// CARA KERJA:
+// Repo publik milik akun `jarwisham` yang ditandai TOPIC
+// "portofolio" di GitHub akan otomatis tampil di website
+// (maksimal 1 jam setelah perubahan, lewat ISR).
+// Tidak perlu mengedit file ini lagi.
+//
+// File ini kini hanya menyimpan TYPE & HELPER — array `projects`
+// sengaja dikosongkan. Kalau suatu saat mau menonjolkan repo
+// tertentu dengan cerita kustom (fitur, tagline khusus), tambahkan
+// entri di sini: repo itu tetap diprioritaskan di atas hasil
+// auto-discovery.
 // ─────────────────────────────────────────────────────────────
 
 export interface ProjectFeature {
@@ -36,74 +37,8 @@ export interface Project {
   category: "web" | "app" | "experiment";
 }
 
-export const projects: Project[] = [
-  {
-    slug: "sistem-kepegawaian",
-    title: "Sistem Kepegawaian",
-    tagline: "Aplikasi manajemen data pegawai berbasis Laravel",
-    description:
-      "Sistem informasi kepegawaian untuk mengelola data pegawai — pencatatan, pencarian, hingga pembaruan status kepegawaian. Dibangun dengan Laravel dan Blade sebagai latihan membangun aplikasi CRUD yang utuh.",
-    github: "jarwisham/sistem-kepegawaian",
-    stack: ["PHP", "Laravel", "Blade", "MySQL"],
-    year: "2026",
-    features: [
-      {
-        title: "CRUD Pegawai",
-        description: "Tambah, ubah, hapus, dan cari data pegawai lewat antarmuka admin.",
-      },
-      {
-        title: "Autentikasi",
-        description: "Login dan pembatasan akses bawaan Laravel untuk halaman administrasi.",
-      },
-    ],
-    tags: ["laravel", "crud", "php"],
-    category: "app",
-  },
-  {
-    slug: "clone-simrs",
-    title: "Clone SIMRS",
-    tagline: "Replikasi antarmuka sistem informasi rumah sakit",
-    description:
-      "Proyek replikasi tampilan SIMRS (Sistem Informasi Manajemen Rumah Sakit) untuk mempelajari pola UI aplikasi medis yang padat data — tabel rekam, navigasi modul, dan alur kerja petugas. Dibangun di atas Laravel + Blade.",
-    github: "jarwisham/clone_simrs",
-    stack: ["PHP", "Laravel", "Blade"],
-    year: "2026",
-    features: [
-      {
-        title: "UI Aplikasi Medis",
-        description: "Replikasi layout modul-modul rumah sakit dengan Blade templating.",
-      },
-      {
-        title: "Alur Data Pasien",
-        description: "Simulasi alur registrasi dan rekam medis ala sistem SIMRS nyata.",
-      },
-    ],
-    tags: ["laravel", "simrs", "healthcare"],
-    category: "web",
-  },
-  {
-    slug: "projek1",
-    title: "Projek 1",
-    tagline: "Halaman web statis pertama dengan HTML murni",
-    description:
-      "Eksperimen awal membangun halaman web menggunakan HTML tanpa framework — fokus pada struktur dokumen, semantic markup, dan styling dasar sebagai fondasi sebelum masuk ke framework modern.",
-    github: "jarwisham/projek1",
-    stack: ["HTML", "CSS"],
-    year: "2026",
-    features: [
-      {
-        title: "Semantic HTML",
-        description: "Struktur halaman ditulis dengan elemen semantik, bukan div bertumpuk.",
-      },
-      {
-        title: "Tanpa Framework",
-        description: "Murni HTML & CSS untuk memahami dasar sebelum pakai tooling.",
-      },
-    ],
-    tags: ["html", "css", "pemula"],
-    category: "experiment",
-  },
-];
+// Kosong = 100% andalkan auto-discovery via topic "portofolio" di GitHub.
+export const projects: Project[] = [];
 
 export type ProjectCategory = Project["category"];
 

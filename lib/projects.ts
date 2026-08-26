@@ -38,93 +38,70 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    slug: "coffee-shop-website",
-    title: "Coffee Shop Landing",
-    tagline: "Landing page dengan nuansa hangat & animasi mulus",
+    slug: "sistem-kepegawaian",
+    title: "Sistem Kepegawaian",
+    tagline: "Aplikasi manajemen data pegawai berbasis Laravel",
     description:
-      "Website promosi kedai kopi dengan sistem menu interaktif, jam buka otomatis, dan integrasi Google Maps. Dibangun dengan fokus pada kecepatan loading dan estetika visual yang konsisten.",
+      "Sistem informasi kepegawaian untuk mengelola data pegawai — pencatatan, pencarian, hingga pembaruan status kepegawaian. Dibangun dengan Laravel dan Blade sebagai latihan membangun aplikasi CRUD yang utuh.",
     github: "jarwisham/sistem-kepegawaian",
-    stack: ["Next.js", "Tailwind CSS", "TypeScript"],
+    stack: ["PHP", "Laravel", "Blade", "MySQL"],
     year: "2026",
     features: [
       {
-        title: "Menu Interaktif",
-        description: "Filter menu berdasarkan kategori dengan animasi transisi halus.",
+        title: "CRUD Pegawai",
+        description: "Tambah, ubah, hapus, dan cari data pegawai lewat antarmuka admin.",
       },
       {
-        title: "Jam Buka Otomatis",
-        description: "Badge buka/tutup yang berubah berdasarkan waktu server.",
+        title: "Autentikasi",
+        description: "Login dan pembatasan akses bawaan Laravel untuk halaman administrasi.",
       },
     ],
-    tags: ["landing-page", "restaurant"],
+    tags: ["laravel", "crud", "php"],
+    category: "app",
+  },
+  {
+    slug: "clone-simrs",
+    title: "Clone SIMRS",
+    tagline: "Replikasi antarmuka sistem informasi rumah sakit",
+    description:
+      "Proyek replikasi tampilan SIMRS (Sistem Informasi Manajemen Rumah Sakit) untuk mempelajari pola UI aplikasi medis yang padat data — tabel rekam, navigasi modul, dan alur kerja petugas. Dibangun di atas Laravel + Blade.",
+    github: "jarwisham/clone_simrs",
+    stack: ["PHP", "Laravel", "Blade"],
+    year: "2026",
+    features: [
+      {
+        title: "UI Aplikasi Medis",
+        description: "Replikasi layout modul-modul rumah sakit dengan Blade templating.",
+      },
+      {
+        title: "Alur Data Pasien",
+        description: "Simulasi alur registrasi dan rekam medis ala sistem SIMRS nyata.",
+      },
+    ],
+    tags: ["laravel", "simrs", "healthcare"],
     category: "web",
   },
   {
-    slug: "weather-dashboard",
-    title: "Weather Dashboard",
-    tagline: "Visualisasi cuaca real-time dengan chart elegan",
+    slug: "projek1",
+    title: "Projek 1",
+    tagline: "Halaman web statis pertama dengan HTML murni",
     description:
-      "Dashboard cuaca yang menampilkan prakiraan 7 hari dalam bentuk grafik interaktif. Data diambil dari Open-Meteo API dengan caching cerdas untuk menghemat request.",
-    github: "ilham/weather-dashboard",
-    stack: ["React", "TypeScript", "Chart.js"],
-    year: "2025",
-    features: [
-      {
-        title: "Forecast 7 Hari",
-        description: "Grafik suhu, kelembapan, dan probabilitas hujan sekaligus.",
-      },
-      {
-        title: "Search Lokasi",
-        description: "Pencarian kota dengan autocomplete dan geolocation.",
-      },
-    ],
-    tags: ["dashboard", "api"],
-    category: "app",
-  },
-  {
-    slug: "todo-ai",
-    title: "Todo AI",
-    tagline: "Aplikasi tugas dengan prioritas otomatis dari AI",
-    description:
-      "Aplikasi manajemen tugas yang menggunakan model bahasa untuk mengelompokkan dan memprioritaskan to-do list secara otomatis. Eksperimen integrasi AI di front-end.",
-    github: "ilham/todo-ai",
-    stack: ["Next.js", "TypeScript", "AI SDK"],
-    year: "2025",
-    features: [
-      {
-        title: "Prioritas AI",
-        description: "AI mengurutkan tugas berdasarkan urgensi dan effort.",
-      },
-      {
-        title: "Offline First",
-        description: "LocalStorage sync dengan UI yang tetap responsif.",
-      },
-    ],
-    tags: ["ai", "productivity"],
-    category: "experiment",
-  },
-  {
-    slug: "kanban-flow",
-    title: "Kanban Flow",
-    tagline: "Manajemen task visual dengan drag-and-drop intuitif",
-    description:
-      "Aplikasi produktivitas berbasis board kanban dengan interaksi drag-and-drop halus, manajemen label dinamis, dan persistensi lokal otomatis.",
-    github: "ilham/kanban-flow",
-    stack: ["React", "TypeScript", "Tailwind CSS", "dnd-kit"],
+      "Eksperimen awal membangun halaman web menggunakan HTML tanpa framework — fokus pada struktur dokumen, semantic markup, dan styling dasar sebagai fondasi sebelum masuk ke framework modern.",
+    github: "jarwisham/projek1",
+    stack: ["HTML", "CSS"],
     year: "2026",
     features: [
       {
-        title: "Smooth Drag & Drop",
-        description: "Pindah task antar kolom secara instan dengan animasi natural.",
+        title: "Semantic HTML",
+        description: "Struktur halaman ditulis dengan elemen semantik, bukan div bertumpuk.",
       },
       {
-        title: "Label & Filter",
-        description: "Kustomisasi warna tag dan pencarian tugas seketika.",
+        title: "Tanpa Framework",
+        description: "Murni HTML & CSS untuk memahami dasar sebelum pakai tooling.",
       },
     ],
-    tags: ["productivity", "react", "kanban"],
-    demo: "https://kanban-flow.vercel.app",
-    category: "app",
+    tags: ["html", "css", "pemula"],
+    category: "experiment",
   },
 ];
 

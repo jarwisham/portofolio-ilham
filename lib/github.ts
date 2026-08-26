@@ -68,8 +68,18 @@ export async function fetchGitHubStats(ownerRepo: string): Promise<GitHubStats> 
   const safeOwner = encodeURIComponent(owner.replace(/[^a-zA-Z0-9-]/g, ""));
   const safeRepo = encodeURIComponent(repo.replace(/[^a-zA-Z0-9-_.]/g, ""));
 
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "portfolio-site",
+  };
+  // Token opsional (env GITHUB_TOKEN) — wajib untuk repo privat,
+  // sekaligus menaikkan kuota rate limit dari 60 jadi 5.000/jam.
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+
   const res = await fetch(`${GITHUB_API}/${safeOwner}/${safeRepo}`, {
-    headers: { Accept: "application/vnd.github+json", "User-Agent": "portfolio-site" },
+    headers,
     // Next.js 16: fetch TIDAK di-cache secara default — wajib opt-in.
     // Revalidate 1 jam → hemat rate limit GitHub + halaman tetap fresh.
     next: { revalidate: 3600 },
@@ -109,9 +119,15 @@ export async function getProjectsWithStats(): Promise<ProjectWithStats[]> {
     }))
   );
 
-  return results.map((r, i) =>
-    r.status === "fulfilled"
-      ? { ...r.value.project, githubStats: r.value.stats }
-      : { ...base[i], githubStats: EMPTY_STATS } // repo gagal di-fetch → tampil tanpa stats
-  );
+  return results.map((r, i) => {
+    if (r.status === "fulfilled") {
+      return { ...r.value.project, githubStats: r.value.stats };
+    }
+    // Repo gagal di-fetch (privat tanpa token / rate limit / GitHub down)
+    // → tampil tanpa stats, tapi link ke repo tetap hidup.
+    return {
+      ...base[i],
+      githubStats: { ...EMPTY_STATS, url: `https://github.com/${base[i].github}` },
+    };
+  });
 }

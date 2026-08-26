@@ -50,6 +50,10 @@ const GITHUB_USERNAME = process.env.GITHUB_USERNAME ?? "jarwisham";
 
 // Repo fork tidak ditampilkan sebagai project otomatis.
 const EXCLUDE_FORKS = true;
+
+// Saklar auto-discovery: hanya repo publik yang punya TOPIC ini di GitHub
+// yang otomatis muncul di portofolio. Bisa dioverride lewat env PORTFOLIO_TOPIC.
+const PORTFOLIO_TOPIC = (process.env.PORTFOLIO_TOPIC ?? "portofolio").toLowerCase();
 const EMPTY_STATS: GitHubStats = {
   stars: 0,
   forks: 0,
@@ -156,7 +160,8 @@ function prettifyRepoName(name: string): string {
 /**
  * Gabungkan kurasi manual (lib/projects.ts) dengan auto-discovery repo GitHub:
  *  - Repo yang sudah dikurasi → pakai cerita/manual apa adanya.
- *  - Repo lain yang publik → dibuatkan kartu otomatis dari metadata repo.
+ *  - Repo lain yang publik → dibuatkan kartu otomatis HANYA jika punya
+ *    topic "portofolio" (atau nilai PORTFOLIO_TOPIC) di repo GitHub-nya.
  * Kalau API gagal, tetap tampilkan kurasi manual saja — situs tidak pernah mati.
  */
 export async function getPortfolioProjects(): Promise<ProjectWithStats[]> {
@@ -173,7 +178,9 @@ export async function getPortfolioProjects(): Promise<ProjectWithStats[]> {
           r.full_name &&
           !r.archived &&
           !(EXCLUDE_FORKS && r.fork) &&
-          !known.has(r.full_name.toLowerCase())
+          !known.has(r.full_name.toLowerCase()) &&
+          // Hanya repo yang ditandai topic "portofolio" yang tampil otomatis.
+          (r.topics ?? []).some((t) => t.toLowerCase() === PORTFOLIO_TOPIC)
       )
       .map((r) => ({
         slug: r.name!,

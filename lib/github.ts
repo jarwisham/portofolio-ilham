@@ -36,7 +36,20 @@ interface GitHubRepoResponse {
   archived?: boolean;
 }
 
+interface GitHubUserRepoResponse extends GitHubRepoResponse {
+  name?: string;
+  full_name?: string;
+  created_at?: string | null;
+  fork?: boolean;
+}
+
 const GITHUB_API = "https://api.github.com/repos";
+
+// Akun GitHub sumber repo — bisa dioverride lewat env GITHUB_USERNAME.
+const GITHUB_USERNAME = process.env.GITHUB_USERNAME ?? "jarwisham";
+
+// Repo fork tidak ditampilkan sebagai project otomatis.
+const EXCLUDE_FORKS = true;
 const EMPTY_STATS: GitHubStats = {
   stars: 0,
   forks: 0,
@@ -101,6 +114,105 @@ export async function fetchGitHubStats(ownerRepo: string): Promise<GitHubStats> 
     url: data.html_url ?? `https://github.com/${ownerRepo}`,
     archived: data.archived ?? false,
   };
+}
+
+/**
+ * Ambil SEMUA repo publik milik GITHUB_USERNAME, urut terbaru didorong.
+ * Dipakai untuk auto-discovery: repo baru yang di-push ke GitHub otomatis
+ * muncul di portofolio tanpa perlu edit kode.
+ */
+async function fetchAllUserRepos(): Promise<GitHubUserRepoResponse[]> {
+  const safeUser = encodeURIComponent(GITHUB_USERNAME.replace(/[^a-zA-Z0-9-]/g, ""));
+
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "portfolio-site",
+  };
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+
+  const res = await fetch(
+    `https://api.github.com/users/${safeUser}/repos?sort=pushed&per_page=100`,
+    { headers, next: { revalidate: 3600 } }
+  );
+
+  if (!res.ok) {
+    throw new Error(`GitHub API ${res.status} untuk user ${GITHUB_USERNAME}`);
+  }
+
+  return (await res.json()) as GitHubUserRepoResponse[];
+}
+
+/** "clone_simrs" → "Clone Simrs", "sistem-kepegawaian" → "Sistem Kepegawaian". */
+function prettifyRepoName(name: string): string {
+  return name
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+/**
+ * Gabungkan kurasi manual (lib/projects.ts) dengan auto-discovery repo GitHub:
+ *  - Repo yang sudah dikurasi → pakai cerita/manual apa adanya.
+ *  - Repo lain yang publik → dibuatkan kartu otomatis dari metadata repo.
+ * Kalau API gagal, tetap tampilkan kurasi manual saja — situs tidak pernah mati.
+ */
+export async function getPortfolioProjects(): Promise<ProjectWithStats[]> {
+  const curated = await getProjectsWithStats();
+
+  try {
+    const repos = await fetchAllUserRepos();
+    const known = new Set(curated.map((p) => p.github.toLowerCase()));
+
+    const auto: ProjectWithStats[] = repos
+      .filter(
+        (r) =>
+          r.name &&
+          r.full_name &&
+          !r.archived &&
+          !(EXCLUDE_FORKS && r.fork) &&
+          !known.has(r.full_name.toLowerCase())
+      )
+      .map((r) => ({
+        slug: r.name!,
+        title: prettifyRepoName(r.name!),
+        tagline: r.description || `Repo open-source dari akun GitHub ${GITHUB_USERNAME}.`,
+        description:
+          r.description ||
+          `Proyek ini ditarik otomatis dari GitHub. Tambahkan deskripsi di repo (atau daftarkan manual di lib/projects.ts) supaya ceritanya lebih menarik.`,
+        github: r.full_name!,
+        stack: r.language ? [r.language] : [],
+        year: String(r.created_at ? new Date(r.created_at).getFullYear() : new Date().getFullYear()),
+        features: [],
+        tags: r.topics ?? [],
+        category: "experiment",
+        githubStats: {
+          stars: r.stargazers_count ?? 0,
+          forks: r.forks_count ?? 0,
+          language: r.language ?? null,
+          description: r.description ?? null,
+          pushedAt: r.pushed_at ?? null,
+          topics: r.topics ?? [],
+          url: r.html_url ?? `https://github.com/${r.full_name}`,
+          archived: r.archived ?? false,
+        },
+      }));
+
+    // Kurasi dulu (unggulan), lalu sisanya urut terbaru aktivitas.
+    return [...curated, ...auto];
+  } catch {
+    return curated;
+  }
+}
+
+/** Cari satu project (kurasi + otomatis) berdasarkan slug. */
+export async function getPortfolioProjectBySlug(
+  slug: string
+): Promise<ProjectWithStats | undefined> {
+  const all = await getPortfolioProjects();
+  return all.find((p) => p.slug === slug);
 }
 
 /**

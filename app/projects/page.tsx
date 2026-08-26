@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getProjectsWithStats } from "../../lib/github";
+import { getPortfolioProjects } from "../../lib/github";
 import ProjectCard from "../../components/project-card";
 import { SectionHeading } from "../../components/primitives";
 
@@ -9,12 +9,13 @@ export const metadata: Metadata = {
 };
 
 /**
- * Halaman daftar project.
- * Statistik GitHub di-cache 1 jam lewat `next: { revalidate: 3600 }`
- * di lib/github.ts (Data Cache) — hemat rate limit tanpa token.
+ * Halaman daftar project — kurasi manual + auto-discovery repo GitHub.
+ * Semuanya di-cache 1 jam lewat `next: { revalidate: 3600 }`
+ * di lib/github.ts (Data Cache) — repo baru muncul otomatis maksimal
+ * 1 jam setelah di-push ke GitHub.
  */
 export default async function ProjectsPage() {
-  const projects = await getProjectsWithStats();
+  const projects = await getPortfolioProjects();
 
   return (
     <div className="mx-auto max-w-5xl px-5 pt-32 pb-24" id="projects">

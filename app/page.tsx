@@ -4,7 +4,7 @@ import AboutSection from "../components/about-section";
 import ProjectsSection from "../components/projects-section";
 import SkillsSection from "../components/skills-section";
 import ContactSection from "../components/contact-section";
-import { getProjectsWithStats } from "../lib/github";
+import { getPortfolioProjects } from "../lib/github";
 
 export const metadata: Metadata = {
   title: "Ilham — Front-End Developer",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const allProjects = await getProjectsWithStats();
+  const allProjects = await getPortfolioProjects();
 
   return (
     <div className="relative overflow-hidden">

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProjectBySlug, getProjectSlugs } from "../../../lib/projects";
-import { fetchGitHubStats, formatCount, type GitHubStats } from "../../../lib/github";
+import { formatCount, getPortfolioProjectBySlug, getPortfolioProjects } from "../../../lib/github";
 import { ArrowRightIcon, ArrowUpRightIcon, ForkIcon, GithubIcon, StarIcon } from "../../../components/icons";
 import { Badge } from "../../../components/primitives";
 
@@ -10,18 +9,20 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-// Bangun statis semua halaman detail saat `next build`.
-export function generateStaticParams() {
-  return getProjectSlugs().map((slug) => ({ slug }));
+// Bangun statis semua halaman detail saat `next build` —
+// termasuk repo yang ditemukan otomatis dari akun GitHub.
+export async function generateStaticParams() {
+  const projects = await getPortfolioProjects();
+  return projects.map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
-  if (!project) return {};
+  const found = await getPortfolioProjectBySlug(slug);
+  if (!found) return {};
   return {
-    title: project.title,
-    description: project.description,
+    title: found.title,
+    description: found.description,
   };
 }
 
@@ -40,14 +41,13 @@ const EMOJI: Record<string, string> = {
 
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
-  if (!project) notFound();
+  const found = await getPortfolioProjectBySlug(slug);
+  if (!found) notFound();
+  const project = found;
 
-  // Stats live GitHub — kalau gagal (repo privat / rate limit), tampilkan kosong.
-  let stats: GitHubStats | null = null;
-  if (project.github) {
-    stats = await fetchGitHubStats(project.github).catch(() => null);
-  }
+  // Stats sudah terisi saat discovery — baik kurasi manual maupun repo otomatis,
+  // dan tetap punya fallback URL walau API GitHub gagal.
+  const { githubStats: stats } = found;
 
   return (
     <article className="mx-auto max-w-3xl px-5 pt-36 pb-24">
@@ -104,25 +104,27 @@ export default async function ProjectPage({ params }: Props) {
         </div>
       )}
 
-      {/* Fitur */}
-      <section className="mt-14">
-        <h2 className="text-sm font-medium tracking-widest text-zinc-400 uppercase dark:text-zinc-500">
-          Fitur utama
-        </h2>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          {project.features.map((feature) => (
-            <div
-              key={feature.title}
-              className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">{feature.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Fitur — hanya untuk project yang dikurasi manual (repo otomatis belum punya) */}
+      {project.features.length > 0 && (
+        <section className="mt-14">
+          <h2 className="text-sm font-medium tracking-widest text-zinc-400 uppercase dark:text-zinc-500">
+            Fitur utama
+          </h2>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            {project.features.map((feature) => (
+              <div
+                key={feature.title}
+                className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900"
+              >
+                <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">{feature.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Tombol aksi */}
       <div className="mt-12 flex flex-col gap-3 sm:flex-row">

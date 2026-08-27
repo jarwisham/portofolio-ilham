@@ -97,9 +97,8 @@ export async function fetchGitHubStats(ownerRepo: string): Promise<GitHubStats> 
 
   const res = await fetch(`${GITHUB_API}/${safeOwner}/${safeRepo}`, {
     headers,
-    // Next.js 16: fetch TIDAK di-cache secara default — wajib opt-in.
-    // Revalidate 1 jam → hemat rate limit GitHub + halaman tetap fresh.
-    next: { revalidate: 3600 },
+    // Revalidate 60 detik + support On-Demand Revalidation via tag "github-repos"
+    next: { revalidate: 60, tags: ["github-repos", `github-repo-${safeOwner}-${safeRepo}`] },
   });
 
   if (!res.ok) {
@@ -138,7 +137,7 @@ async function fetchAllUserRepos(): Promise<GitHubUserRepoResponse[]> {
 
   const res = await fetch(
     `https://api.github.com/users/${safeUser}/repos?sort=pushed&per_page=100`,
-    { headers, next: { revalidate: 3600 } }
+    { headers, next: { revalidate: 60, tags: ["github-repos", "github-all-repos"] } }
   );
 
   if (!res.ok) {

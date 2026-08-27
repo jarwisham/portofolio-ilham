@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { ProjectWithStats } from "../lib/github";
 import ProjectCard from "./project-card";
-import { SectionHeading } from "./primitives";
-import { SparkleIcon } from "./icons";
+import { ArrowRightIcon, SparkleIcon } from "./icons";
 
 interface ProjectsSectionProps {
   projects: ProjectWithStats[];
@@ -66,13 +66,27 @@ export default function ProjectsSection({ projects }: ProjectsSectionProps) {
         ))}
       </div>
 
+      {/* Tombol Aksi Lihat Semua Proyek */}
+      <div className="mt-10 flex flex-col items-center justify-between gap-4 sm:flex-row">
+        <Link
+          href="/projects"
+          className="group inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-white px-6 py-3 text-sm font-semibold text-zinc-900 shadow-sm transition-all hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-blue-500 dark:hover:bg-blue-950/40 dark:hover:text-blue-300"
+        >
+          <span>Lihat Semua Proyek</span>
+          <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+        </Link>
+
+        <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
+          {filteredProjects.length} dari {projects.length} proyek ditampilkan
+        </span>
+      </div>
+
       {/* Footer Info Proyek */}
-      <div className="mt-10 flex items-center justify-between rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 dark:border-zinc-800/80 dark:bg-zinc-900/40 text-xs text-zinc-500 dark:text-zinc-400">
+      <div className="mt-6 flex items-center justify-between rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 dark:border-zinc-800/80 dark:bg-zinc-900/40 text-xs text-zinc-500 dark:text-zinc-400">
         <div className="flex items-center gap-2">
-          <SparkleIcon className="h-4 w-4 text-blue-500" />
+          <SparkleIcon className="h-4 w-4 text-blue-500 shrink-0" />
           <span>Statistik GitHub diperbarui otomatis melalui GitHub REST API.</span>
         </div>
-        <span className="font-mono text-[11px]">{filteredProjects.length} proyek ditampilkan</span>
       </div>
     </section>
   );

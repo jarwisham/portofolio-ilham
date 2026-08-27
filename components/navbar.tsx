@@ -18,7 +18,7 @@ export default function Navbar() {
   const router = useRouter();
   const isHome = pathname === "/";
 
-  // Monitor scroll position untuk efek glassmorphism dinamis (selalu muncul saat scroll atas, bawah, maupun diam)
+  // Monitor scroll position untuk efek glassmorphism dinamis
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -29,38 +29,73 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Intersection observer untuk menandai link navbar yang sedang aktif
+  // Scroll Spy presisi tinggi untuk mendeteksi section aktif saat scrolling
   useEffect(() => {
+    if (!isHome) {
+      setActiveSection("");
+      return;
+    }
+
     const sectionIds = ["about", "projects", "skills", "contact"];
-    const elements = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      {
-        rootMargin: "-20% 0px -60% 0px",
-        threshold: 0.1,
+    const handleScrollSpy = () => {
+      // 1. Cek jika berada di paling atas halaman (Hero)
+      if (window.scrollY < 120) {
+        setActiveSection("");
+        return;
       }
-    );
 
-    elements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+      // 2. Cek jika sudah scroll sampai ujung paling bawah halaman (Contact)
+      const isAtBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 70;
+      if (isAtBottom) {
+        setActiveSection("contact");
+        return;
+      }
+
+      // 3. Deteksi section yang sedang berada di area fokus viewport
+      const focusY = 180; // Jarak offset dari atas viewport (di bawah navbar)
+      let currentSection = "";
+
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= focusY && rect.bottom > focusY) {
+            currentSection = id;
+            break;
+          }
+        }
+      }
+
+      // Fallback jika berada di antara batas padding section
+      if (!currentSection) {
+        for (let i = sectionIds.length - 1; i >= 0; i--) {
+          const el = document.getElementById(sectionIds[i]);
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            if (rect.top <= focusY) {
+              currentSection = sectionIds[i];
+              break;
+            }
+          }
+        }
+      }
+
+      setActiveSection(currentSection);
+    };
+
+    window.addEventListener("scroll", handleScrollSpy, { passive: true });
+    handleScrollSpy(); // Evaluasi langsung saat pertama mount
+
+    return () => window.removeEventListener("scroll", handleScrollSpy);
+  }, [isHome]);
 
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
 
-    // Di halaman selain home (mis. /projects/[slug]) section anchor tidak ada —
-    // navigasikan kembali ke home dengan hash agar menu tetap berfungsi.
+    // Di halaman selain home (mis. /projects atau /about)
     if (!isHome) {
-      setActiveSection("");
       router.push(href === "#top" ? "/" : `/${href}`);
       return;
     }
@@ -68,17 +103,16 @@ export default function Navbar() {
     if (href === "#" || href === "#top") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       setActiveSection("");
+      history.replaceState(null, "", window.location.pathname);
       return;
     }
 
     const targetId = href.replace("#", "");
     const targetElement = document.getElementById(targetId);
     if (targetElement) {
-      targetElement.scrollIntoView({ behavior: "smooth" });
-      // Selaraskan hash URL tanpa trigger lompatan ulang —
-      // supaya refresh tetap di section yang sama.
-      history.replaceState(null, "", href);
       setActiveSection(targetId);
+      targetElement.scrollIntoView({ behavior: "smooth" });
+      history.replaceState(null, "", href);
     }
   };
 
@@ -106,7 +140,11 @@ export default function Navbar() {
 
         <div className="flex items-center gap-0.5">
           {NAV_LINKS.map((link) => {
-            const isActive = activeSection === link.id;
+            const isActive = isHome
+              ? activeSection === link.id
+              : (link.id === "projects" && pathname.startsWith("/projects")) ||
+                (link.id === "about" && pathname === "/about");
+
             return (
               <a
                 key={link.href}

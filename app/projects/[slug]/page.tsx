@@ -43,13 +43,33 @@ export default async function ProjectPage({ params }: Props) {
 
   return (
     <article className="mx-auto max-w-3xl px-5 pt-36 pb-24">
+      {/* Tombol kembali yang jelas terlihat */}
       <Link
         href="/projects"
-        className="inline-flex items-center gap-1 text-sm text-zinc-500 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400"
+        className="group inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-800 shadow-sm transition-all hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-blue-500 dark:hover:bg-blue-950/40 dark:hover:text-blue-300"
       >
-        <ArrowRightIcon className="h-4 w-4 rotate-180" />
-        Semua proyek
+        <ArrowRightIcon className="h-4 w-4 rotate-180 transition-transform group-hover:-translate-x-0.5" />
+        Kembali ke Semua Proyek
       </Link>
+
+      {/* Navigasi cepat ke menu utama */}
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+        <span className="text-zinc-400 dark:text-zinc-600">atau langsung ke:</span>
+        {[
+          { href: "/#top", label: "Beranda" },
+          { href: "/#about", label: "About" },
+          { href: "/#skills", label: "Skills" },
+          { href: "/#contact", label: "Contact" },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="rounded-full px-2.5 py-1 font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
 
       {/* Header */}
       <div className="mt-8">

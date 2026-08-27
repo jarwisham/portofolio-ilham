@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 const NAV_LINKS = [
   { href: "#about", label: "About", id: "about" },
@@ -13,6 +14,9 @@ export default function Navbar() {
   const headerRef = useRef<HTMLElement>(null);
   const [activeSection, setActiveSection] = useState<string>("");
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const isHome = pathname === "/";
 
   // Monitor scroll position untuk efek glassmorphism dinamis (selalu muncul saat scroll atas, bawah, maupun diam)
   useEffect(() => {
@@ -52,6 +56,15 @@ export default function Navbar() {
 
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
+
+    // Di halaman selain home (mis. /projects/[slug]) section anchor tidak ada —
+    // navigasikan kembali ke home dengan hash agar menu tetap berfungsi.
+    if (!isHome) {
+      setActiveSection("");
+      router.push(href === "#top" ? "/" : `/${href}`);
+      return;
+    }
+
     if (href === "#" || href === "#top") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       setActiveSection("");
@@ -62,6 +75,9 @@ export default function Navbar() {
     const targetElement = document.getElementById(targetId);
     if (targetElement) {
       targetElement.scrollIntoView({ behavior: "smooth" });
+      // Selaraskan hash URL tanpa trigger lompatan ulang —
+      // supaya refresh tetap di section yang sama.
+      history.replaceState(null, "", href);
       setActiveSection(targetId);
     }
   };

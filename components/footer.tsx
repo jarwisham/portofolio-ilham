@@ -11,33 +11,35 @@ export default function Footer() {
           </p>
         </div>
 
+        {/* Pakai path absolut "/#..." agar berfungsi dari halaman mana pun,
+            bukan hanya home tempat section-section itu ada. */}
         <div className="flex flex-wrap items-center gap-5 text-xs text-zinc-500 dark:text-zinc-400">
           <a
-            href="#about"
+            href="/#about"
             className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-50"
           >
             About
           </a>
           <a
-            href="#projects"
+            href="/#projects"
             className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-50"
           >
             Projects
           </a>
           <a
-            href="#skills"
+            href="/#skills"
             className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-50"
           >
             Skills
           </a>
           <a
-            href="#contact"
+            href="/#contact"
             className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-50"
           >
             Contact
           </a>
           <a
-            href="https://github.com/ilham"
+            href="https://github.com/jarwisham"
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-50"
